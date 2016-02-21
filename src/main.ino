@@ -3,22 +3,36 @@
 #include <Servo.h>
 #include <Timer.h>
 
-#define CLOCKWISE 45
+#define CLOCKWISE 45           // directions of the motor
 #define COUNTER 120
 
-const int clkPin = 2;
+const int clkPin = 2;         // pins
 const int dtPin = 3;
 const int swPin = 4;
 const int vexPin = 7;
 const int resetPin = 10;
 
-int count = 0;
+int count = 0;               // ticks of the rotary encoder
+
+int repeat;                  // number of times to stop and take pic
+int repeats = 0;             // number of repeats that took place
+int pictures;                // number of pictures to take at each stop
 
 Servo VEX;
 Timer t;
 
-void setup()
-{
+void setup() {
+   Serial.begin(9600);
+   while (!Serial.available()) {
+     ;
+   }
+   char input1 = Serial.read();
+   while (!Serial.available()) {
+     ;
+   }
+   char input2 = Serial.read();
+   repeat = input1 - '0';
+   pictures = input2 - '0';
    VEX.attach(vexPin);
    pinMode(clkPin, INPUT);
    pinMode(dtPin, INPUT);
@@ -26,12 +40,13 @@ void setup()
    pinMode(resetPin, INPUT);
    digitalWrite(swPin, HIGH);
    digitalWrite(resetPin, HIGH);
-   Serial.begin(9600);
-   t.every(30000, takePicture);
+   Serial.println(repeat);
+   Serial.println(pictures);
+   t.every(30000, takePicture, repeat);
 }
 
 void loop() {
-  if (digitalRead(resetPin) == LOW) {
+  if (digitalRead(resetPin) == LOW || repeats >= repeat) {
     reset();
   }
   monitorTurns();
@@ -39,8 +54,7 @@ void loop() {
   t.update();
 }
 
-void monitorTurns()
-{
+void monitorTurns() {
   static int oldA = HIGH;
   static int oldB = HIGH;
   int newA = digitalRead(clkPin);
@@ -59,9 +73,12 @@ void monitorTurns()
 
 void takePicture() {
   VEX.write(0);
-  delay(1000);
-  Serial.println("Took Picture!");
-  delay(1000);
+  for (int i = 0; i<pictures; i++ ) {
+    delay(1000);
+    Serial.println("Took Picture!");
+    delay(1000);
+  }
+  repeats++;
 }
 
 void reset() {
