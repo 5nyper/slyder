@@ -8,5 +8,6 @@ An Automated device to move a camera across a rail and take snapshots
 - [x] connect rotary encoder and monitor ticks
 - [x] connect VEX motor and turn it both directions
 - [x] add button to reset the device back to its starting point
-- [x] add smaple test scenario of this device in action
+- [x] add sample test scenario of this device in action
+- [ ] finish motor logic (physical, not virtual)
 - [ ] add bluetooth so User input can be read
