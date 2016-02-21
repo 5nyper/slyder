@@ -15,24 +15,17 @@ const int resetPin = 10;
 int count = 0;               // ticks of the rotary encoder
 
 int repeat;                  // number of times to stop and take pic
-int repeats = 0;             // number of repeats that took place
 int pictures;                // number of pictures to take at each stop
+int dur;                     // duration between each stop
+
+int repeats = 0;             // number of repeats that took place
 
 Servo VEX;
 Timer t;
 
 void setup() {
    Serial.begin(9600);
-   while (!Serial.available()) {
-     ;
-   }
-   char input1 = Serial.read();
-   while (!Serial.available()) {
-     ;
-   }
-   char input2 = Serial.read();
-   repeat = input1 - '0';
-   pictures = input2 - '0';
+   getInput();
    VEX.attach(vexPin);
    pinMode(clkPin, INPUT);
    pinMode(dtPin, INPUT);
@@ -42,7 +35,7 @@ void setup() {
    digitalWrite(resetPin, HIGH);
    Serial.println(repeat);
    Serial.println(pictures);
-   t.every(30000, takePicture, repeat);
+   t.every(dur, takePicture, repeat);
 }
 
 void loop() {
@@ -59,10 +52,8 @@ void monitorTurns() {
   static int oldB = HIGH;
   int newA = digitalRead(clkPin);
   int newB = digitalRead(dtPin);
-  if (newA != oldA || newB != oldB)
-  {
-    if (oldA == HIGH && newA == LOW)
-    {
+  if (newA != oldA || newB != oldB) {
+    if (oldA == HIGH && newA == LOW) {
       count += (oldB * 2 - 1); //oldB is either 1 or 0
     }
   }
@@ -89,4 +80,22 @@ void reset() {
     Serial.println(count);
   }
   exit(1);
+}
+
+void getInput() {
+  while (!Serial.available()) {
+    ;
+  }
+  char input1 = Serial.read();
+  while (!Serial.available()) {
+    ;
+  }
+  char input2 = Serial.read();
+  while (!Serial.available()) {
+    ;
+  }
+  char input3 = Serial.read();
+  repeat = input1 - '0';
+  pictures = input2 - '0';
+  dur = (input3 - '0') * 1000;
 }
