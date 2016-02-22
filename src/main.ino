@@ -104,5 +104,6 @@ void getInput() {
 
 void resetTimer(int current) {
   t.stop(current);
-  t.every(dur*1.5, takePicture, repeat);
+  float calc = ((float)(dur + (2000 * pictures)) / dur);  // fixes timer offset
+  t.every(dur*calc, takePicture, repeat);
 }
