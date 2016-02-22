@@ -1,5 +1,5 @@
 # camrail [![Build status](https://api.travis-ci.org/Vikaton/camrail.svg?branch=master)](https://travis-ci.org/Vikaton/camrail)
-An Automated device to move a camera across a rail and take snapshots
+Motorized Motion Control System for Camera Slider
 
 # Setup
 ![So far](http://i.imgur.com/gU4MALz.jpg)
