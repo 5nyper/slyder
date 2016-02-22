@@ -19,6 +19,7 @@ int pictures;                // number of pictures to take at each stop
 int dur;                     // duration between each stop
 
 int repeats = 0;             // number of repeats that took place
+int event;                   // timer
 
 Servo VEX;
 Timer t;
@@ -35,7 +36,7 @@ void setup() {
    digitalWrite(resetPin, HIGH);
    Serial.println(repeat);
    Serial.println(pictures);
-   t.every(dur, takePicture, repeat);
+   event = t.every(dur, takePicture, repeat);
 }
 
 void loop() {
@@ -70,6 +71,7 @@ void takePicture() {
     delay(1000);
   }
   repeats++;
+  resetTimer(event);
 }
 
 void reset() {
@@ -98,4 +100,9 @@ void getInput() {
   repeat = input1 - '0';
   pictures = input2 - '0';
   dur = (input3 - '0') * 1000;
+}
+
+void resetTimer(int current) {
+  t.stop(current);
+  t.every(dur*1.5, takePicture, repeat);
 }
