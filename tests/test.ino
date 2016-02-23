@@ -18,12 +18,26 @@ int dur;                     // duration between each stop
 
 int repeats = 0;             // number of repeats that took place
 
+class vex_t {
+public:
+  void attach(int put) {
+    pinMode(put, OUTPUT);
+    pin = put;
+  }
+  void write(int value) {
+    analogWrite(pin, value);
+  }
+private:
+  int pin;
+};
+
 Timer t;
+vex_t VEX;
 
 void setup() {
    Serial.begin(9600);
   // getInput();
-   pinMode(vexPin, OUTPUT);
+   VEX.attach(vexPin);
    pinMode(clkPin, INPUT);
    pinMode(dtPin, INPUT);
    pinMode(swPin, INPUT);
@@ -41,7 +55,7 @@ void loop() {
   }*/
   monitorTurns();
   for(int i = -255;i<255; i++) {
-    analogWrite(vexPin, i);
+    VEX.write(i);
   }
   //t.update();
 }
@@ -62,7 +76,7 @@ void monitorTurns() {
 }
 
 void takePicture() {
-  analogWrite(vexPin, 0);
+  VEX.write(0);
   for (int i = 0; i<pictures; i++ ) {
     delay(1000);
     Serial.println("Took Picture!");
@@ -75,7 +89,7 @@ void reset() {
   Serial.println("Resetting");
   while (count != 0) {
     monitorTurns();
-    analogWrite(vexPin, -45);
+    VEX.write(-45);
     Serial.println(count);
   }
   exit(1);
