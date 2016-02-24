@@ -3,8 +3,8 @@
 #include <Servo.h>
 #include <Timer.h>
 
-#define CLOCKWISE 45           // directions of the motor
-#define COUNTER 120
+#define CLOCKWISE 2000         // directions of the motor
+#define COUNTER 1000
 
 const int clkPin = 2;         // pins
 const int dtPin = 3;
@@ -44,7 +44,7 @@ void loop() {
     reset();
   }
   monitorTurns();
-  VEX.write(45);
+  VEX.writeMicroseconds(CLOCKWISE);
   t.update();
 }
 
