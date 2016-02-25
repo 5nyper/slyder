@@ -9,5 +9,7 @@ Motorized Motion Control System for Camera Slider
 - [x] connect VEX motor and turn it both directions
 - [x] add button to reset the device back to its starting point
 - [x] add sample test scenario of this device in action
+- [x] use higher voltage power supply and control motor speed
 - [ ] finish motor logic (physical, not virtual)
 - [ ] add bluetooth so User input can be read
+- [ ] add shutter automation
