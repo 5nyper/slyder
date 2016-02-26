@@ -44,7 +44,7 @@ void loop() {
     reset();
   }
   monitorTurns();
-  VEX.writeMicroseconds(CLOCKWISE);
+  VEX.writeMicroseconds(1800);
   t.update();
 }
 
@@ -78,7 +78,7 @@ void reset() {
   Serial.println("Resetting");
   while (count != 0) {
     monitorTurns();
-    VEX.write(COUNTER);
+    VEX.writeMicroseconds(1400);
     Serial.println(count);
   }
   exit(1);
