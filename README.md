@@ -14,7 +14,9 @@ A VEX motor is hooked up to one end of a rail, and the rotary encoder is hooked 
 - 2.5mm TRS Jack (1)
 
 # Setup
-[![PoC](https://j.gifs.com/VO5GKM.gif)](https://www.youtube.com/watch?v=Rjd7jY60sRE&feature=youtu.be)
+(Prototype so far)
+
+![PoC](https://j.gifs.com/VO5GKM.gif) [Youtube Video](https://www.youtube.com/watch?v=Rjd7jY60sRE&feature=youtu.be)
 
 ![Frizting](http://i.imgur.com/L8Fay1x.png)
 
