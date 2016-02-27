@@ -1,63 +1,79 @@
 #include <Arduino.h>
+
+#include <Servo.h>
 #include <Timer.h>
 
-#define CLOCKWISE 45           // directions of the motor
-#define COUNTER 120
+#define CLOCKWISE 1800         // directions of the motor
+#define COUNTER 1400
 
 const int clkPin = 2;         // pins
 const int dtPin = 3;
 const int swPin = 4;
-const int vexPin = 9;
+int vexPin = 7;
 const int resetPin = 10;
+const int camPin = 9;
 
 int count = 0;               // ticks of the rotary encoder
 
-int repeat;                  // number of times to stop and take pic
-int pictures;                // number of pictures to take at each stop
-int dur;                     // duration between each stop
-
 int repeats = 0;             // number of repeats that took place
+int event;                   // timer
+Timer t;
 
-class vex_t {
+class Slider {
 public:
-  void attach(int put) {
-    pinMode(put, OUTPUT);
-    pin = put;
+  int repeat;                  // number of times to stop and take pic
+  int pictures;                // number of pictures to take at each stop
+  int dur;                     // duration between each stop
+  void init(int reps = 2, int phots = 1, int secs = 4, int pin = 7) {
+    vexPin = pin;
+    VEX.attach(vexPin);
+    repeat = reps;
+    pictures = 1;
+    dur = secs;
   }
-  void write(int value) {
-    analogWrite(pin, value);
+  void reset() {
+    Serial.println("Resetting");
+    while (count != 0) {
+      monitorTurns();
+      VEX.writeMicroseconds(COUNTER);
+      Serial.println(count);
+    }
+    exit(1);
+  }
+  void resetTimer(int current) {
+    t.stop(current);
+    float calc = ((float)(dur + (2000 * pictures)) / dur);  // fixes timer offset
+    event = t.every(dur*calc, takePicture, repeat);
+  }
+  void write(int micro) {
+    VEX.writeMicroseconds(micro);
   }
 private:
-  int pin;
+  Servo VEX;
 };
 
-Timer t;
-vex_t VEX;
+Slider obj;
 
 void setup() {
    Serial.begin(9600);
-  // getInput();
-   VEX.attach(vexPin);
+   getInput();
    pinMode(clkPin, INPUT);
    pinMode(dtPin, INPUT);
    pinMode(swPin, INPUT);
    pinMode(resetPin, INPUT);
+   pinMode(camPin, OUTPUT);
    digitalWrite(swPin, HIGH);
    digitalWrite(resetPin, HIGH);
-  // Serial.println(repeat);
-//Serial.println(pictures);
-   t.every(dur, takePicture, repeat);
+   event = t.every(obj.dur, takePicture, obj.repeat);
 }
 
 void loop() {
- /* if (digitalRead(resetPin) == LOW || repeats >= repeat) {
-    reset();
-  }*/
-  monitorTurns();
-  for(int i = -255;i<255; i++) {
-    VEX.write(i);
+  if (digitalRead(resetPin) == LOW || repeats >= obj.repeat) {
+    obj.reset();
   }
-  //t.update();
+  monitorTurns();
+  obj.write(CLOCKWISE);
+  t.update();
 }
 
 void monitorTurns() {
@@ -76,23 +92,17 @@ void monitorTurns() {
 }
 
 void takePicture() {
-  VEX.write(0);
-  for (int i = 0; i<pictures; i++ ) {
+  obj.write(0);
+  for (int i = 0; i<obj.pictures; i++ ) {
     delay(1000);
+    digitalWrite(camPin, HIGH);
+    delay(300);
+    digitalWrite(camPin, LOW);
     Serial.println("Took Picture!");
     delay(1000);
   }
   repeats++;
-}
-
-void reset() {
-  Serial.println("Resetting");
-  while (count != 0) {
-    monitorTurns();
-    VEX.write(-45);
-    Serial.println(count);
-  }
-  exit(1);
+  obj.resetTimer(event);
 }
 
 void getInput() {
@@ -108,7 +118,8 @@ void getInput() {
     ;
   }
   char input3 = Serial.read();
-  repeat = input1 - '0';
-  pictures = input2 - '0';
-  dur = (input3 - '0') * 1000;
+  int repeat = input1 - '0';
+  int pictures = input2 - '0';
+  int dur = (input3 - '0') * 1000;
+  obj.init(repeat, pictures, dur);
 }
