@@ -3,14 +3,15 @@
 #include <Servo.h>
 #include <Timer.h>
 
-#define CLOCKWISE 2000         // directions of the motor
-#define COUNTER 1000
+#define CLOCKWISE 1800         // directions of the motor
+#define COUNTER 1400
 
 const int clkPin = 2;         // pins
 const int dtPin = 3;
 const int swPin = 4;
 const int vexPin = 7;
 const int resetPin = 10;
+const int camPin = 9;
 
 int count = 0;               // ticks of the rotary encoder
 
@@ -32,6 +33,7 @@ void setup() {
    pinMode(dtPin, INPUT);
    pinMode(swPin, INPUT);
    pinMode(resetPin, INPUT);
+   pinMode(camPin, OUTPUT);
    digitalWrite(swPin, HIGH);
    digitalWrite(resetPin, HIGH);
    Serial.println(repeat);
@@ -44,7 +46,7 @@ void loop() {
     reset();
   }
   monitorTurns();
-  VEX.writeMicroseconds(1800);
+  VEX.writeMicroseconds(CLOCKWISE);
   t.update();
 }
 
@@ -67,6 +69,9 @@ void takePicture() {
   VEX.write(0);
   for (int i = 0; i<pictures; i++ ) {
     delay(1000);
+    digitalWrite(camPin, HIGH);
+    delay(300);
+    digitalWrite(camPin, LOW);
     Serial.println("Took Picture!");
     delay(1000);
   }
@@ -78,7 +83,7 @@ void reset() {
   Serial.println("Resetting");
   while (count != 0) {
     monitorTurns();
-    VEX.writeMicroseconds(1400);
+    VEX.writeMicroseconds(COUNTER);
     Serial.println(count);
   }
   exit(1);
