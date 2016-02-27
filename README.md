@@ -2,7 +2,7 @@
 Motorized Motion Control System for Camera Slider
 
 # Setup
-![So far](http://i.imgur.com/gU4MALz.jpg)
+![So far](http://i.imgur.com/L8Fay1x.png)(https://www.youtube.com/watch?v=Rjd7jY60sRE&feature=youtu.be)
 
 # TODO
 - [x] connect rotary encoder and monitor ticks
