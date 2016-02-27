@@ -11,4 +11,4 @@ Motorized Motion Control System for Camera Slider
 - [x] add sample test scenario of this device in action
 - [x] use higher voltage power supply and control motor speed
 - [ ] finish motor logic (physical, not virtual)
-- [ ] add shutter automation
+- [x] add shutter automation
