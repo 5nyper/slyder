@@ -1,4 +1,4 @@
-# camrail [![Build status](https://api.travis-ci.org/Vikaton/camrail.svg?branch=master)](https://travis-ci.org/Vikaton/camrail)
+# Slider [![Build status](https://api.travis-ci.org/Vikaton/camrail.svg?branch=master)](https://travis-ci.org/Vikaton/camrail)
 Motorized Motion Control Slider
 
 A VEX motor is hooked up to one end of a rail, and the rotary encoder is hooked up on the other side. as the motor turns, the rotary encoder monitors the revolutions so it knows when to stop and take x amount of photos, and continous for the length of y. once it reaches its end, the motor turns counter clockwise and the rotary encoders goes back down to its starting point. There is also a push button to manually reset the slider.
