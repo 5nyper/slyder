@@ -6,14 +6,14 @@
 #define CLOCKWISE 1800         // directions of the motor
 #define COUNTER 1400
 
-const int clkPin = 2;         // pins
-const int dtPin = 3;
-const int swPin = 4;
+const int fPin = 3;         // pins
+const int sPin = 2;
 const int vexPin = 7;
 const int resetPin = 10;
 const int camPin = 9;
 
 int count = 0;               // ticks of the rotary encoder
+int oldA = LOW;
 
 int repeat;                  // number of times to stop and take pic
 int pictures;                // number of pictures to take at each stop
@@ -29,12 +29,10 @@ void setup() {
    Serial.begin(9600);
    getInput();
    VEX.attach(vexPin);
-   pinMode(clkPin, INPUT);
-   pinMode(dtPin, INPUT);
-   pinMode(swPin, INPUT);
+   pinMode(fPin, INPUT);
+   pinMode(sPin, INPUT);
    pinMode(resetPin, INPUT);
    pinMode(camPin, OUTPUT);
-   digitalWrite(swPin, HIGH);
    digitalWrite(resetPin, HIGH);
    Serial.println(repeat);
    Serial.println(pictures);
@@ -51,18 +49,18 @@ void loop() {
 }
 
 void monitorTurns() {
-  static int oldA = HIGH;
-  static int oldB = HIGH;
-  int newA = digitalRead(clkPin);
-  int newB = digitalRead(dtPin);
-  if (newA != oldA || newB != oldB) {
-    if (oldA == HIGH && newA == LOW) {
-      count += (oldB * 2 - 1); //oldB is either 1 or 0
+  int newA = digitalRead(fPin);
+  int newB = digitalRead(sPin);
+  if ((oldA == LOW) && (newA == HIGH)) {
+    if (newB == LOW) {
+      count--; //oldB is either 1 or 0
     }
+    else {
+      count++;
+    }
+    Serial.println(count);
   }
   oldA = newA;
-  oldB = newB;
-  Serial.println(count);
 }
 
 void takePicture() {
@@ -84,7 +82,6 @@ void reset() {
   while (count != 0) {
     monitorTurns();
     VEX.writeMicroseconds(COUNTER);
-    Serial.println(count);
   }
   exit(1);
 }
