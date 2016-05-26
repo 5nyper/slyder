@@ -33,9 +33,7 @@ void setup() {
    pinMode(sPin, INPUT);
    pinMode(resetPin, INPUT);
    pinMode(camPin, OUTPUT);
-   digitalWrite(resetPin, HIGH);
-   Serial.println(repeat);
-   Serial.println(pictures);
+   digitalWrite(resetPin, HIGH); 
    event = t.every(dur, takePicture, repeat);
 }
 
@@ -53,7 +51,7 @@ void monitorTurns() {
   int newB = digitalRead(sPin);
   if ((oldA == LOW) && (newA == HIGH)) {
     if (newB == LOW) {
-      count--; //oldB is either 1 or 0
+      count--;
     }
     else {
       count++;
@@ -65,7 +63,7 @@ void monitorTurns() {
 
 void takePicture() {
   VEX.write(0);
-  for (int i = 0; i<pictures; i++ ) {
+  for (int i = 0; i<pictures; i++) {
     delay(1000);
     digitalWrite(camPin, HIGH);
     delay(300);
@@ -106,6 +104,6 @@ void getInput() {
 
 void resetTimer(int current) {
   t.stop(current);
-  float calc = ((float)(dur + (2000 * pictures)) / dur);  // fixes timer offset
+  float calc = ((float)(dur + (2000 * pictures)) / dur);  // formula to fixe timer offset
   event = t.every(dur*calc, takePicture, repeat);
 }
