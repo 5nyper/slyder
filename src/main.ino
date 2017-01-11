@@ -8,7 +8,7 @@ I2CEncoder encoder;
 const int fPin = 3;  
 const long len = 233280;// pins
 const int sPin = 2;
-const int vexPin = A7;
+const int vexPin = A2;
 const int resetPin = 11;
 const int camPin = 9;
 int in1Pin = 7;
@@ -27,7 +27,10 @@ int event;                   // timer
 
 void setup() {
     Wire.begin();
-   Serial.begin(9600);
+   //Serial.begin(9600);
+   Serial.begin(9600);  //initializing bluetooth serial connection
+   pinMode(19, INPUT_PULLUP);
+   pinMode(18, INPUT_PULLUP);
    pinMode(vexPin, OUTPUT);
    pinMode(fPin, INPUT);
    pinMode(sPin, INPUT);
@@ -40,12 +43,25 @@ void setup() {
   getInput3();
 }
 
+void testBt() {
+  Serial.println("Test3");
+//  Serial2.println("Test2");
+//  Serial1.println("Test1");
+}
+
+
 void loop() {
   initslide();
+
+   int offset = floor (60 -((7776*(0.24339217+0.0020943471*pictures+0.0000048879012*(pictures*pictures)-.5))/(pictures-1)));
+
+  Serial.println("in loop");
+    Serial.print("1 of ");
+    Serial.print(pictures);
   takePicture();
   Serial.println(-dur);
-  for (int i = 0; i<pictures; i++) {
-    while(encoder.getRawPosition() > -dur) {
+  for (int i = 0; i<pictures - 1; i++) {
+    while(encoder.getRawPosition() > -dur + offset ){
       if(Serial.available()) {
         char input = Serial.read();
         if(input == '0') {
@@ -57,9 +73,9 @@ void loop() {
           if(input2 == '1') {
             continue;
           }
-        }
+        }        
         if (input == '2') {
-          initslide();
+          reset();
         }
       }
       if (digitalRead(resetPin) == LOW) {
@@ -67,6 +83,13 @@ void loop() {
       }
       setMotor(255, true);
     }
+    
+    setMotor(150, false); //moving motor backwards after each stop to counter the "drift", was 200, just changed to 150
+    delay(150); //the time the motor moves backwards to counter the "drift"
+    
+    Serial.print(i+2);
+    Serial.print(" of ");
+    Serial.print(pictures);
     takePicture();
   }
   while (true) {
@@ -84,12 +107,14 @@ void setMotor(int speed, boolean reverse)
 }
 
 void takePicture() {
-    setMotor(0, true);
+    setMotor(70, false);
     delay((secsBefore * 1000));
     digitalWrite(camPin, HIGH);
     delay(300);
     digitalWrite(camPin, LOW);
     Serial.println("Took Picture!");
+    Serial.println(encoder.getRawPosition());
+    Serial.println(-dur);
     delay((secsAfter * 1000));
     repeats++;
     encoder.zero();
@@ -97,17 +122,14 @@ void takePicture() {
 
 void reset() {
   Serial.println("Resetting");
-  while (encoder.getRawPosition() != 0) {
+  while(digitalRead(resetPin) != 0) {
     setMotor(255, false);
-  }
-  while (true) {
-    setMotor(0, false);
   }
 }
 
 void initslide() {
   setMotor(255, true);
-  while(encoder.getRawPosition() > -3000) {
+  while(encoder.getRawPosition() > -500) {
    setMotor(255, true);
   }
     
@@ -115,10 +137,10 @@ void initslide() {
     setMotor(255, false);
   }
   encoder.zero();
-  while(encoder.getRawPosition() > -3000) {
+  while(encoder.getRawPosition() > -1500) { //changed from -2500 to 1500 to give more bar length in beginning...
     setMotor(255, true);
   }
-  setMotor(0, true);
+  setMotor(150, false);
   encoder.zero();
 }
 
@@ -152,7 +174,7 @@ void getInput1() {
     pictures = pics.toInt();
   }
   Serial.println(pictures);
-  dur = (long) len / pictures;
+  dur = (long) len / (pictures-1);  //changed this to pictures minus 1 because that should be the number of stops....OOPS!!!! this will change everything!
 }
 void getInput2() {
   char test[10];
@@ -175,13 +197,13 @@ void getInput2() {
     else {
       sprintf(test, "%c%c", input4, input5);
       String pics = String(test);
-      secsBefore = (pics.toInt()) * 1000;
+      secsBefore = (pics.toInt()) * 1; //think 1000 is too much, trying 1
     }
   }
   else {
     sprintf(test, "%c%c%c", input3, input4, input5);
     String pics = String(test);
-    secsBefore = (pics.toInt()) * 1000;
+    secsBefore = (pics.toInt()) * 1; //think 1000 isn't right, trying 1
   }
   Serial.println(secsBefore);
 }
@@ -206,13 +228,13 @@ void getInput3() {
     else {
       sprintf(test, "%c%c", input4, input5);
       String pics = String(test);
-      secsAfter = (pics.toInt()) * 1000;
+      secsAfter = (pics.toInt()) * 1; //changed from 1000 to 1
     }
   }
   else {
     sprintf(test, "%c%c%c", input3, input4, input5);
     String pics = String(test);
-    secsAfter = (pics.toInt()) * 1000;
+    secsAfter = (pics.toInt()) * 1; //changed from 1000 to 1, not needed as it is 3 digits
   }
   Serial.println(secsAfter);
 }
