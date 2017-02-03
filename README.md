@@ -23,5 +23,7 @@ A VEX motor is hooked up to one end of a rail, and the rotary encoder is hooked 
 - [x] add button to reset the device back to its starting point
 - [x] add sample test scenario of this device in action
 - [x] use higher voltage power supply and control motor speed
-- [ ] finish motor logic (physical, not virtual)
+- [x] finish motor logic (physical, not virtual)
 - [x] add shutter automation
+- [x] add functions to save data 
+- [ ] add polynomial regression for machine learning
