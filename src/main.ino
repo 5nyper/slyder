@@ -189,7 +189,41 @@ void loop() {
 }
 
 int machineLearning(int x) {
-  
+  int len = EEPROM.readInt(CACHE_LENGTH_ADDRESS);
+  long double x_mean = 0.0,
+        y_mean = 0.0,
+        x_sq_mean = 0.0,
+        x_sum = 0.0,
+        y_sum = 0.0,
+        xy_sum = 0.0,
+        x_cb_sum = 0.0,
+        x_4_sum = 0.0,
+        x2y_sum = 0.0;
+  for(int i = 0; i< len; i++) {
+    x_mean += (long double)loadedData[i][0];
+    y_mean += (long double)loadedData[i][1];
+    x_sq_mean += (long double)pow(loadedData[i][0],2);
+    x_sum += (long double)loadedData[i][0];
+    y_sum += (long double)loadedData[i][1];
+    xy_sum += (long double)(loadedData[i][0] * loadedData[i][1]);
+    x_cb_sum += (long double)pow(loadedData[i][0], 3);
+    x_4_sum += (long double)pow(loadedData[i][0], 4);
+    x2y_sum += (long double)(pow(loadedData[i][0],2) * loadedData[i][1]);
+  }
+  x_mean /= (long double)len;
+  y_mean /= (long double)len;
+  x_sq_mean /= (long double)len;
+
+  long double sxx = x_sq_mean - pow(x_mean, 2);
+  long double sxy = (xy_sum/len) - (x_mean * y_mean);
+  long double sxx2 = (x_cb_sum/len) - (x_mean * x_sq_mean);
+  long double sx2x2 = (x_4_sum/len) - (x_sq_mean * x_sq_mean);
+  long double sx2y = (x2y_sum/len) - (x_sq_mean * y_mean);
+  long double B = ((sxy*sx2x2)-(sx2y*sxx2))/((sxx*sx2x2)-pow(sxx2, 2));
+  long double C = ((sx2y*sxx)-(sxy*sxx2))/((sxx*sx2x2)-pow(sxx2,2));
+  long double A = y_mean-(B*x_mean)-(C*x_sq_mean);
+
+  return ((int)(A + B*x + C*pow(x, 2)));
 }
 
 void setMotor(int speed, boolean reverse) {
