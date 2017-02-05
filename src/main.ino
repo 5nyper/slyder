@@ -188,7 +188,7 @@ void loop() {
   } 
 }
 
-int machineLearning(int x) {
+int polynomialRegression(int x) {
   int len = EEPROM.readInt(CACHE_LENGTH_ADDRESS);
   long double x_mean = 0.0,
         y_mean = 0.0,
