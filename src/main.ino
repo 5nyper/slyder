@@ -43,7 +43,7 @@ int event;       // timer
 void setup() {
   BigNumber::begin ();
 
-  BigNumber::setScale(8);
+  BigNumber::setScale(9); // 9 significant figures are essential with the datapoints we currently have
   Wire.begin();
   Serial.begin(9600); // initializing bluetooth serial connection
   //EEPROM.writeInt(CACHE_LENGTH_ADDRESS, -1);
