@@ -3,6 +3,7 @@
 #include <I2CEncoder.h>
 #include <EEPROMex.h>
 #include <EEPROMVar.h>
+#include <BigNumber.h>
 
 #define CACHE_LENGTH_ADDRESS 0
 
@@ -40,6 +41,9 @@ int repeats = 0; // number of repeats that took place
 int event;       // timer
 
 void setup() {
+  BigNumber::begin ();
+
+  BigNumber::setScale(8);
   Wire.begin();
   Serial.begin(9600); // initializing bluetooth serial connection
   //EEPROM.writeInt(CACHE_LENGTH_ADDRESS, -1);
@@ -189,8 +193,8 @@ void loop() {
 }
 
 int polynomialRegression(int x) {
-  int len = EEPROM.readInt(CACHE_LENGTH_ADDRESS);
-  long double x_mean = 0.0,
+  BigNumber len = EEPROM.readInt(CACHE_LENGTH_ADDRESS);
+  BigNumber x_mean = 0.0,
         y_mean = 0.0,
         x_sq_mean = 0.0,
         x_sum = 0.0,
@@ -199,31 +203,44 @@ int polynomialRegression(int x) {
         x_cb_sum = 0.0,
         x_4_sum = 0.0,
         x2y_sum = 0.0;
-  for(int i = 0; i< len; i++) {
-    x_mean += (long double)loadedData[i][0];
-    y_mean += (long double)loadedData[i][1];
-    x_sq_mean += (long double)pow(loadedData[i][0],2);
-    x_sum += (long double)loadedData[i][0];
-    y_sum += (long double)loadedData[i][1];
-    xy_sum += (long double)(loadedData[i][0] * loadedData[i][1]);
-    x_cb_sum += (long double)pow(loadedData[i][0], 3);
-    x_4_sum += (long double)pow(loadedData[i][0], 4);
-    x2y_sum += (long double)(pow(loadedData[i][0],2) * loadedData[i][1]);
+  for(int i = 0; i < len; i++) {
+    x_mean += (BigNumber)loadedData[i][0];
+    y_mean += (BigNumber)loadedData[i][1];
+    x_sq_mean += BigNumber(loadedData[i][0]).pow(2);
+    //printBignum(BigNumber(loadedData[i][0]).pow(2));
+    x_sum += (BigNumber)loadedData[i][0];
+    y_sum += (BigNumber)loadedData[i][1];
+    xy_sum += (BigNumber((long)loadedData[i][0]) * BigNumber((long)loadedData[i][1]));
+    x_cb_sum += (BigNumber)BigNumber(loadedData[i][0]).pow(3);
+    x_4_sum += BigNumber(loadedData[i][0]).pow(4);
+    x2y_sum += (BigNumber(loadedData[i][0]).pow(2) * BigNumber((long)loadedData[i][1]));
   }
-  x_mean /= (long double)len;
-  y_mean /= (long double)len;
-  x_sq_mean /= (long double)len;
+  x_mean /= (BigNumber)BigNumber(len);
+  y_mean /= (BigNumber)BigNumber(len);
+  x_sq_mean /= (BigNumber)BigNumber(len);
 
-  long double sxx = x_sq_mean - pow(x_mean, 2);
-  long double sxy = (xy_sum/len) - (x_mean * y_mean);
-  long double sxx2 = (x_cb_sum/len) - (x_mean * x_sq_mean);
-  long double sx2x2 = (x_4_sum/len) - (x_sq_mean * x_sq_mean);
-  long double sx2y = (x2y_sum/len) - (x_sq_mean * y_mean);
-  long double B = ((sxy*sx2x2)-(sx2y*sxx2))/((sxx*sx2x2)-pow(sxx2, 2));
-  long double C = ((sx2y*sxx)-(sxy*sxx2))/((sxx*sx2x2)-pow(sxx2,2));
-  long double A = y_mean-(B*x_mean)-(C*x_sq_mean);
+  BigNumber sxx = x_sq_mean - BigNumber(x_mean).pow(2);
+  BigNumber  sxy = (BigNumber(xy_sum)/BigNumber(len)) - (BigNumber(x_mean) * BigNumber(y_mean));
+  BigNumber sxx2 = (x_cb_sum/len) - (x_mean * x_sq_mean);
+  BigNumber  sx2x2 = (x_4_sum/len) - (x_sq_mean * x_sq_mean);
+  BigNumber  sx2y = (x2y_sum/len) - BigNumber((x_sq_mean * y_mean));
+  BigNumber  B = ((sxy*sx2x2)-BigNumber((sx2y*sxx2)))/((sxx*sx2x2)-BigNumber(sxx2).pow(2));
+  BigNumber  C = ((sx2y*sxx)-BigNumber((sxy*sxx2)))/((sxx*sx2x2)-BigNumber(sxx2).pow(2));
+  BigNumber  A = y_mean-(B*x_mean)-(C*x_sq_mean);
 
-  return ((int)(A + B*x + C*pow(x, 2)));
+  //BigNumber woo = "100125952";
+
+ // BigNumber d = BigNumber(woo) / BigNumber(6);
+
+  //printBignum(d);
+
+  printBignum(B);
+  printBignum(C);
+  printBignum(A);
+  //Serial.println((double)A);
+  //Serial.println((double)B);
+  //Serial.println((double)C);
+  //Serial.println((long)(A + B*x + C*pow(x, 2)));
 }
 
 void setMotor(int speed, boolean reverse) {
