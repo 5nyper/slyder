@@ -192,7 +192,7 @@ void loop() {
   } 
 }
 
-int polynomialRegression(int x) {
+long polynomialRegression(int x) {
   BigNumber len = EEPROM.readInt(CACHE_LENGTH_ADDRESS);
   BigNumber x_mean = 0.0,
         y_mean = 0.0,
@@ -207,7 +207,6 @@ int polynomialRegression(int x) {
     x_mean += (BigNumber)loadedData[i][0];
     y_mean += (BigNumber)loadedData[i][1];
     x_sq_mean += BigNumber(loadedData[i][0]).pow(2);
-    //printBignum(BigNumber(loadedData[i][0]).pow(2));
     x_sum += (BigNumber)loadedData[i][0];
     y_sum += (BigNumber)loadedData[i][1];
     xy_sum += (BigNumber((long)loadedData[i][0]) * BigNumber((long)loadedData[i][1]));
@@ -228,19 +227,7 @@ int polynomialRegression(int x) {
   BigNumber  C = ((sx2y*sxx)-BigNumber((sxy*sxx2)))/((sxx*sx2x2)-BigNumber(sxx2).pow(2));
   BigNumber  A = y_mean-(B*x_mean)-(C*x_sq_mean);
 
-  //BigNumber woo = "100125952";
-
- // BigNumber d = BigNumber(woo) / BigNumber(6);
-
-  //printBignum(d);
-
-  printBignum(B);
-  printBignum(C);
-  printBignum(A);
-  //Serial.println((double)A);
-  //Serial.println((double)B);
-  //Serial.println((double)C);
-  //Serial.println((long)(A + B*x + C*pow(x, 2)));
+  return((long)(A + B*x + C*pow(x, 2)));
 }
 
 void setMotor(int speed, boolean reverse) {
